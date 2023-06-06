@@ -7,9 +7,13 @@ var change2021 = landscapeChange
       ee.Filter.eq('study_area', 'CONUS')  // or 'SEAK'
     ))
 
-// Add the 2000 tree cover image to the map.
-Map.addLayer(gfc2020, treeCoverViz, 'Hansen 2000 Tree Cover');
-
+// Create a visualization for tree cover in 2000.
+var treeCoverViz = {
+    bands: ['treecover2000'],
+    min: 0,
+    max: 100,
+    palette: ['black', 'green']
+};
 // Create a visualization for the year of tree loss over the past 20 years.
 var treeLossYearViz = {
     bands: ['lossyear'],
@@ -18,5 +22,7 @@ var treeLossYearViz = {
     palette: ['yellow', 'red']
 };
 
+// Add the 2000 tree cover image to the map.
+Map.addLayer(gfc2020, treeCoverViz, 'Hansen 2000 Tree Cover');
 // Create a custom visualization for the change2021 layer.
 Map.addLayer(gfc2020, treeLossYearViz, '2000-2020 Year of Loss');
