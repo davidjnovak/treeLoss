@@ -51,6 +51,9 @@ var treeLossYearViz = {
 };
 
 // Add the 2000 tree cover image to the map.
-Map.addLayer(gfc2020, treeCoverViz, 'Hansen 2000 Tree Cover');
-// Create a custom visualization for the change2021 layer.
+Map.addLayer(gfc2020, treeGainYearViz, "gain");
+Map.addLayer(change2021, {}, 'Change 2021');
+Map.addLayer(change2010, {}, 'Change 2010');
+Map.addLayer(pellet_collection, {}, "Wood Pellet Plants")
 Map.addLayer(gfc2020, treeLossYearViz, '2000-2020 Year of Loss');
+
