@@ -1,5 +1,7 @@
 // Import the ESA WorldCover dataset.
+var worldCover = ee.ImageCollection('ESA/WorldCover/v100').first();
 var gfc2020 = ee.Image('UMD/hansen/global_forest_change_2021_v1_9');
+var landscapeChange = ee.ImageCollection('USFS/GTAC/LCMS/v2021-7');
 
 var pellet_plants = [
 ee.Feature(ee.Geometry.Point(-91.8720, 32.9559), {description: "Morehouse Bioenergy"}),
@@ -29,11 +31,25 @@ ee.Feature(ee.Geometry.Point(-94.4322, 30.7424), {description: "Woodville Pellet
 ee.Feature(ee.Geometry.Point(-82.3404, 32.5301), {description: "LJR Forest Products"})
 ];
 
+var pellet_collection = ee.FeatureCollection(pellet_plants);
+
 var change2021 = landscapeChange
     .filter(ee.Filter.and(
       ee.Filter.eq('year', 2021),  // range: [1985, 2021]
       ee.Filter.eq('study_area', 'CONUS')  // or 'SEAK'
     ))
+    .first().select('Change');
+var change2010 = landscapeChange
+    .filter(ee.Filter.and(
+      ee.Filter.eq('year', 2010),  // range: [1985, 2021]
+      ee.Filter.eq('study_area', 'CONUS')  // or 'SEAK'
+    ))
+    .first().select('Change');
+
+// Add the worldCover layer to the map.
+Map.addLayer(worldCover, {
+    bands: ['Map']
+}, 'WorldCover');
 
 // Create a visualization for tree cover in 2000.
 var treeCoverViz = {
@@ -42,6 +58,9 @@ var treeCoverViz = {
     max: 100,
     palette: ['black', 'green']
 };
+// Add the 2000 tree cover image to the map.
+Map.addLayer(gfc2020, treeCoverViz, 'Hansen 2000 Tree Cover');
+
 // Create a visualization for the year of tree loss over the past 20 years.
 var treeLossYearViz = {
     bands: ['lossyear'],
@@ -50,10 +69,7 @@ var treeLossYearViz = {
     palette: ['yellow', 'red']
 };
 
-// Add the 2000 tree cover image to the map.
-Map.addLayer(gfc2020, treeGainYearViz, "gain");
-Map.addLayer(change2021, {}, 'Change 2021');
-Map.addLayer(change2010, {}, 'Change 2010');
+
+// Create a custom visualization for the change2021 layer.
 Map.addLayer(pellet_collection, {}, "Wood Pellet Plants")
 Map.addLayer(gfc2020, treeLossYearViz, '2000-2020 Year of Loss');
-
