@@ -33,6 +33,25 @@ ee.Feature(ee.Geometry.Point(-82.3404, 32.5301), {description: "LJR Forest Produ
 
 var pellet_collection = ee.FeatureCollection(pellet_plants);
 
+var region = ee.Geometry.Polygon([
+  [-77.90757649680197, 35.30679030719262],
+  [-77.89783471365988, 35.301711974293504],
+  [-77.89422982474386, 35.30465394391733],
+  [-77.90431493063986, 35.31330411579906],
+  [-77.90757649680197, 35.30679030719262]
+]);
+
+var regionImage = ee.Image().paint({
+  featureCollection: ee.FeatureCollection([ee.Feature(region)]),
+  color: "purple",
+  width: 3
+});
+
+var cutArea = regionImage.paint(region, 'purple');
+
+Map.addLayer(cutArea, {}, 'Region');
+
+
 var change2021 = landscapeChange
     .filter(ee.Filter.and(
       ee.Filter.eq('year', 2021),  // range: [1985, 2021]
