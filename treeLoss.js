@@ -41,6 +41,15 @@ var region = ee.Geometry.Polygon([
   [-77.90757649680197, 35.30679030719262]
 ]);
 
+// Calculate area in square meters
+var areaSqMeters = region.area();
+
+// Convert to acres
+var areaAcres = areaSqMeters.multiply(0.000247105);
+
+// Print the area to the console
+print('Area: ', areaAcres);
+
 var regionImage = ee.Image().paint({
   featureCollection: ee.FeatureCollection([ee.Feature(region)]),
   color: "purple",
