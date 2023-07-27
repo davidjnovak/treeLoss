@@ -1,0 +1,55 @@
+var gfc = ee.Image("UMD/hansen/global_forest_change_2021_v1_9");
+
+var lossyear = gfc.select("lossyear");
+
+var region = ee.Geometry.Polygon([
+  [-77.90757649680197, 35.30679030719262],
+  [-77.89783471365988, 35.301711974293504],
+  [-77.89422982474386, 35.30465394391733],
+  [-77.90431493063986, 35.31330411579906],
+  [-77.90757649680197, 35.30679030719262]
+]);
+
+var areaSqMeters = region.area();
+var areaHectares = areaSqMeters.multiply(0.0001);
+
+print('Area (hectares): ', areaHectares);
+
+var regionImage = ee.Image().paint({
+  featureCollection: ee.FeatureCollection([ee.Feature(region)]),
+  color: "purple",
+  width: 3
+});
+
+var cutArea = regionImage.paint(region, 'purple');
+
+Map.addLayer(cutArea, {}, 'Region');
+
+// Define a function to calculate the number of pixels lost each year.
+var countLossByYear = function(year) {
+  var lossInYear = lossyear.eq(year);
+  var areaLostInYear = lossInYear.multiply(ee.Image.pixelArea());
+  var totalAreaLost = areaLostInYear.reduceRegion({
+    reducer: ee.Reducer.sum(),
+    geometry: region,
+    scale: 30,  // The scale should match the scale of the dataset.
+    maxPixels: 1e9
+  });
+
+  // The result is a dictionary; get the result as a number, in hectares.
+  return ee.Number(totalAreaLost.get("lossyear")).divide(10000);
+};
+var loss2017 = countLossByYear(17);
+var loss2020 = countLossByYear(20);
+var loss2021 = countLossByYear(21);
+
+print("Forest loss in 2017 (hectares):", loss2017);
+print("Forest loss in 2019 (hectares):", loss2020);
+print("Forest loss in 2020 (hectares):", loss2021);
+
+var regionArea = ee.Number(areaSqMeters.divide(10000));  // convert to hectares
+var percentLoss2020 = loss2020.divide(regionArea).multiply(100);
+var percentLoss2021 = loss2021.divide(regionArea).multiply(100);
+
+print("Percentage of region lost in 2020:", percentLoss2020);
+print("Percentage of region lost in 2021:", percentLoss2021);
