@@ -1,7 +1,7 @@
 var worldCover = ee.ImageCollection('ESA/WorldCover/v100').first();
 var gfc2020 = ee.Image('UMD/hansen/global_forest_change_2021_v1_9');
 var landscapeChange = ee.ImageCollection('USFS/GTAC/LCMS/v2021-7');
-var lossyear = gfc.select("lossyear");
+var lossyear = gfc2020.select("lossyear");
 
 var pellet_plants = [
 ee.Feature(ee.Geometry.Point(-91.8720, 32.9559), {description: "Morehouse Bioenergy"}),
@@ -56,7 +56,7 @@ var cutArea = regionImage.paint(region, 'purple');
 
 function addLossLayer(startYear, endYear) {
   var mask = lossyear.gte(startYear - 2000).and(lossyear.lte(endYear - 2000));
-  var maskedImage = gfc.updateMask(mask);
+  var maskedImage = gfc2020.updateMask(mask);
   Map.addLayer(maskedImage, {bands: ['loss'], max: 1, palette: ['red']}, "Loss " + startYear + "-" + endYear);
 }
 
