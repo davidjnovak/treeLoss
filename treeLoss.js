@@ -1,7 +1,7 @@
-// Import the ESA WorldCover dataset.
 var worldCover = ee.ImageCollection('ESA/WorldCover/v100').first();
 var gfc2020 = ee.Image('UMD/hansen/global_forest_change_2021_v1_9');
 var landscapeChange = ee.ImageCollection('USFS/GTAC/LCMS/v2021-7');
+var lossyear = gfc.select("lossyear");
 
 var pellet_plants = [
 ee.Feature(ee.Geometry.Point(-91.8720, 32.9559), {description: "Morehouse Bioenergy"}),
@@ -41,13 +41,9 @@ var region = ee.Geometry.Polygon([
   [-77.90757649680197, 35.30679030719262]
 ]);
 
-// Calculate area in square meters
 var areaSqMeters = region.area();
-
-// Convert to acres
 var areaAcres = areaSqMeters.multiply(0.000247105);
 
-// Print the area to the console
 print('Area: ', areaAcres);
 
 var regionImage = ee.Image().paint({
@@ -58,38 +54,28 @@ var regionImage = ee.Image().paint({
 
 var cutArea = regionImage.paint(region, 'purple');
 
+function addLossLayer(startYear, endYear) {
+  var mask = lossyear.gte(startYear - 2000).and(lossyear.lte(endYear - 2000));
+  var maskedImage = gfc.updateMask(mask);
+  Map.addLayer(maskedImage, {bands: ['loss'], max: 1, palette: ['red']}, "Loss " + startYear + "-" + endYear);
+}
+
+addLossLayer(2017, 2019);
+
 Map.addLayer(cutArea, {}, 'Region');
 
-
-var change2021 = landscapeChange
-    .filter(ee.Filter.and(
-      ee.Filter.eq('year', 2021),  // range: [1985, 2021]
-      ee.Filter.eq('study_area', 'CONUS')  // or 'SEAK'
-    ))
-    .first().select('Change');
-var change2010 = landscapeChange
-    .filter(ee.Filter.and(
-      ee.Filter.eq('year', 2010),  // range: [1985, 2021]
-      ee.Filter.eq('study_area', 'CONUS')  // or 'SEAK'
-    ))
-    .first().select('Change');
-
-// Add the worldCover layer to the map.
 Map.addLayer(worldCover, {
     bands: ['Map']
 }, 'WorldCover');
 
-// Create a visualization for tree cover in 2000.
 var treeCoverViz = {
     bands: ['treecover2000'],
     min: 0,
     max: 100,
     palette: ['black', 'green']
 };
-// Add the 2000 tree cover image to the map.
 Map.addLayer(gfc2020, treeCoverViz, 'Hansen 2000 Tree Cover');
 
-// Create a visualization for the year of tree loss over the past 20 years.
 var treeLossYearViz = {
     bands: ['lossyear'],
     min: 0,
@@ -98,6 +84,5 @@ var treeLossYearViz = {
 };
 
 
-// Create a custom visualization for the change2021 layer.
 Map.addLayer(pellet_collection, {}, "Wood Pellet Plants")
 Map.addLayer(gfc2020, treeLossYearViz, '2000-2020 Year of Loss');
