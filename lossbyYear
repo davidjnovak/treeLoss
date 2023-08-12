@@ -35,8 +35,6 @@ var countLossByYear = function(year) {
     scale: 30,  // The scale should match the scale of the dataset.
     maxPixels: 1e9
   });
-
-  // The result is a dictionary; get the result as a number, in hectares.
   return ee.Number(totalAreaLost.get("lossyear")).divide(10000);
 };
 var loss2017 = countLossByYear(17);
