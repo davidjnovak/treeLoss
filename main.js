@@ -1,3 +1,9 @@
+var worldCover = ee.ImageCollection('ESA/WorldCover/v100').first();
+var gfc = ee.Image('UMD/hansen/global_forest_change_2021_v1_9');
+var landscapeChange = ee.ImageCollection('USFS/GTAC/LCMS/v2021-7');
+var lossyear = gfc.select("lossyear");
+
+
 var pelletPlants = [
     ee.Feature(ee.Geometry.Point(-91.8720, 32.9559), {description: "Morehouse Bioenergy", yearly_acres: 12600, open_year: ee.Date('2015-01-01')}),
     ee.Feature(ee.Geometry.Point(-91.0377, 31.1849), {description: "Amite Bioenergy", yearly_acres: 12600, open_year: ee.Date('2015-01-01')}),
@@ -25,28 +31,36 @@ var pelletPlants = [
     ee.Feature(ee.Geometry.Point(-94.4322, 30.7424), {description: "Woodville Pellets", yearly_acres: 12000, open_year: ee.Date('2014-01-01')}),
     ee.Feature(ee.Geometry.Point(-82.3404, 32.5301), {description: "LJR Forest Products", yearly_acres: 5712, open_year: ee.Date('2016-01-01')})
   ];
-  
-  function addBuffer(features, bufferSize) {
-      return features.map(function(feature) {
-          return ee.Feature(feature.geometry().buffer(bufferSize));
-      });
+
+function addBuffers(features, bufferSize) {
+    return features.map(function(feature) {
+        return ee.Feature(feature.geometry().buffer(bufferSize));
+    });
+}
+
+function addBuffer(feature, bufferSize) {
+    return feature.geometry().buffer(bufferSize);
+}
+
+function countLossByYear(year, region) {
+    console.log(region)
+    var lossInYear = lossyear.eq(year);
+    var areaLostInYear = lossInYear.multiply(ee.Image.pixelArea());
+    var totalAreaLost = areaLostInYear.reduceRegion({
+      reducer: ee.Reducer.sum(),
+      geometry: region,
+      scale: 30,  // The scale should match the scale of the dataset.
+      maxPixels: 1e9
+    });
+    return ee.Number(totalAreaLost.get("lossyear")).divide(10000);
   }
+
+  var loss2017 = countLossByYear(21, addBuffer(pelletPlants[0], 80467));
   
-  
-  //example for accessing
-  var feature = pelletPlants[0]; 
-  var coordinates = feature.geometry().coordinates();
-  var lon = coordinates.get(0);
-  var lat = coordinates.get(1);
-  console.log(feature.get("description"));
-  console.log(lon);console.log(lat);
-  
-  
-  
-  var bufferedPelletPlants = addBuffer(pelletPlants, 80467);
-  
-  var pelletCollection = ee.FeatureCollection(bufferedPelletPlants);
-  
-  Map.addLayer(pelletCollection, {}, "Wood Pellet Plants")
-  
-  
+  console.log(loss2017)
+
+var bufferedPelletPlants = addBuffers(pelletPlants, 80467);
+var bufferedPlantCollection = ee.FeatureCollection(bufferedPelletPlants);
+
+Map.addLayer(bufferedPlantCollection, {}, "Wood Pellet Plants with buffer")
+
