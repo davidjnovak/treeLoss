@@ -31,36 +31,43 @@ var pelletPlants = [
     ee.Feature(ee.Geometry.Point(-94.4322, 30.7424), {description: "Woodville Pellets", yearly_acres: 12000, open_year: ee.Date('2014-01-01')}),
     ee.Feature(ee.Geometry.Point(-82.3404, 32.5301), {description: "LJR Forest Products", yearly_acres: 5712, open_year: ee.Date('2016-01-01')})
   ];
+var bufferedPelletPlants = addBuffers(pelletPlants, 75);
+var bufferedPlantCollection = ee.FeatureCollection(bufferedPelletPlants);
 
-function addBuffers(features, bufferSize) {
-    return features.map(function(feature) {
-        return ee.Feature(feature.geometry().buffer(bufferSize));
-    });
+
+function addBuffers(features, miles) {
+  var bufferSize = miles * 1609.34; 
+  return features.map(function(feature) {
+      return ee.Feature(feature.geometry().buffer(bufferSize));
+  });
 }
 
-function addBuffer(feature, bufferSize) {
-    return feature.geometry().buffer(bufferSize);
+function addBuffer(feature, miles) {
+  var bufferSize = miles * 1609.34;
+  return feature.geometry().buffer(bufferSize);
 }
 
 function countLossByYear(year, region) {
-    console.log(region)
-    var lossInYear = lossyear.eq(year);
-    var areaLostInYear = lossInYear.multiply(ee.Image.pixelArea());
-    var totalAreaLost = areaLostInYear.reduceRegion({
-      reducer: ee.Reducer.sum(),
-      geometry: region,
-      scale: 30,  // The scale should match the scale of the dataset.
-      maxPixels: 1e9
-    });
-    return ee.Number(totalAreaLost.get("lossyear")).divide(10000);
-  }
+  console.log(region)
+  var lossInYear = lossyear.eq(year);
+  var areaLostInYear = lossInYear.multiply(ee.Image.pixelArea());
+  var totalAreaLost = areaLostInYear.reduceRegion({
+    reducer: ee.Reducer.sum(),
+    geometry: region,
+    scale: 30,  // The scale should match the scale of the gfc dataset.
+    maxPixels: 1e9
+  });
+  return ee.Number(totalAreaLost.get("lossyear")).divide(10000);
+}
 
-  var loss2017 = countLossByYear(21, addBuffer(pelletPlants[0], 80467));
-  
-  console.log(loss2017)
+function addLossLayer(startYear, endYear) {
+  var mask = lossyear.gte(startYear - 2000).and(lossyear.lte(endYear - 2000));
+  var maskedImage = gfc2020.updateMask(mask);
+  Map.addLayer(maskedImage, {bands: ['loss'], max: 1, palette: ['red']}, "Loss " + startYear + "-" + endYear);
+}
 
-var bufferedPelletPlants = addBuffers(pelletPlants, 80467);
-var bufferedPlantCollection = ee.FeatureCollection(bufferedPelletPlants);
+  var lossbyyear = countLossByYear(21, addBuffer(bufferedPelletPlants[0], 75));
+  console.log(lossbyyear)
 
 Map.addLayer(bufferedPlantCollection, {}, "Wood Pellet Plants with buffer")
 
