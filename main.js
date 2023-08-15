@@ -70,4 +70,3 @@ function addLossLayer(startYear, endYear) {
   console.log(lossbyyear)
 
 Map.addLayer(bufferedPlantCollection, {}, "Wood Pellet Plants with buffer")
-
