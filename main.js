@@ -69,4 +69,12 @@ function addLossLayer(startYear, endYear) {
   var lossbyyear = countLossByYear(21, addBuffer(bufferedPelletPlants[0], 75));
   console.log(lossbyyear)
 
+  pelletPlants.forEach(function(plant) {
+    var openYear = plant.get('open_year');
+    var year = openYear.getInfo().value.slice(0, 4); // Extract year from the ee.Date
+    var bufferedPlant = addBuffer(plant, 75);
+    var lossByYearForPlant = countLossByYear(parseInt(year) - 2000, bufferedPlant); // Assuming lossyear is represented as years since 2000
+    console.log(plant.get('description').getInfo() + " (" + year + "): " + lossByYearForPlant.getInfo());
+  });
+  
 Map.addLayer(bufferedPlantCollection, {}, "Wood Pellet Plants with buffer")
