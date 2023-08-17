@@ -84,4 +84,21 @@ function addLossLayer(startYear, endYear) {
     // console.log(plant.get('description').getInfo() + " (" + year + "): " + lossByYearForPlant.getInfo());
   });
 
+var treeCoverViz = {
+    bands: ['treecover2000'],
+    min: 0,
+    max: 100,
+    palette: ['black', 'green']
+};
+var treeLossYearViz = {
+    bands: ['lossyear'],
+    min: 0,
+    max: 21,
+    palette: ['yellow', 'red']
+};
+
+Map.addLayer(gfc, treeCoverViz, 'Hansen 2000 Tree Cover');
+Map.addLayer(pellet_collection, {}, "Wood Pellet Plants")
+Map.addLayer(gfc, treeLossYearViz, '2000-2020 Year of Loss');
+Map.addLayer(worldCover, {bands: ['Map']}, 'WorldCover');
 Map.addLayer(bufferedPlantCollection, {}, "Wood Pellet Plants with buffer")
