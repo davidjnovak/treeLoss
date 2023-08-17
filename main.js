@@ -62,7 +62,7 @@ function countLossByYear(year, region) {
 
 function addLossLayer(startYear, endYear) {
   var mask = lossyear.gte(startYear - 2000).and(lossyear.lte(endYear - 2000));
-  var maskedImage = gfc2020.updateMask(mask);
+  var maskedImage = gfc.updateMask(mask);
   Map.addLayer(maskedImage, {bands: ['loss'], max: 1, palette: ['red']}, "Loss " + startYear + "-" + endYear);
 }
 
@@ -70,11 +70,18 @@ function addLossLayer(startYear, endYear) {
   console.log(lossbyyear)
 
   pelletPlants.forEach(function(plant) {
-    var openYear = plant.get('open_year');
-    var year = openYear.getInfo().value.slice(0, 4); // Extract year from the ee.Date
+    var openYear = plant.get('open_year').getInfo;
+    var yearlyAcres = plant.get('yearly_acres');
+    // var year = openYear.getInfo().value.slice(0, 4); // Extract year from the ee.Date
     var bufferedPlant = addBuffer(plant, 75);
-    var lossByYearForPlant = countLossByYear(parseInt(year) - 2000, bufferedPlant); // Assuming lossyear is represented as years since 2000
-    console.log(plant.get('description').getInfo() + " (" + year + "): " + lossByYearForPlant.getInfo());
+    console.log(plant.get('description').getInfo();
+    console.log("open year", openYear);
+    console.log("yearly acres", yearlyAcres);
+    for (var i = 0; i <= 21; i ++){
+      console.log(countLossByYear(i, bufferredPlant).getInfo());
+    }
+    // var lossByYearForPlant = countLossByYear(parseInt(year) - 2000, bufferedPlant); // Assuming lossyear is represented as years since 2000
+    // console.log(plant.get('description').getInfo() + " (" + year + "): " + lossByYearForPlant.getInfo());
   });
-  
+
 Map.addLayer(bufferedPlantCollection, {}, "Wood Pellet Plants with buffer")
