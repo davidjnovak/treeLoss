@@ -14,12 +14,12 @@ var pelletPlants = [
     // ee.Feature(ee.Geometry.Point(-76.9721, 36.6534), {description: "Enviva Southampton", yearly_acres: 17880, open_year: ee.Date('2015-01-01')}),
     // ee.Feature(ee.Geometry.Point(-85.3911, 30.7401), {description: "Enviva Cottondale", yearly_acres: 17520, open_year: ee.Date('2008-01-01')}),
     // ee.Feature(ee.Geometry.Point(-78.1839, 35.1210), {description: "Enviva Sampson", yearly_acres: 14400, open_year: ee.Date('2016-01-01')}),
-    ee.Feature(ee.Geometry.Point(-79.6379, 34.9337), {description: "Enviva Hamlet", yearly_acres: 14400, open_year: ee.Date('2019-01-01')}),
+    // ee.Feature(ee.Geometry.Point(-79.6379, 34.9337), {description: "Enviva Hamlet", yearly_acres: 14400, open_year: ee.Date('2019-01-01')}),
     // ee.Feature(ee.Geometry.Point(-82.0634, 34.2290), {description: "Enviva Greenwood", yearly_acres: 14400, open_year: ee.Date('2018-01-01')}),
     // ee.Feature(ee.Geometry.Point(-76.9656, 36.2690), {description: "Enviva Ahoskie", yearly_acres: 14400, open_year: ee.Date('2011-01-01')}),
     // ee.Feature(ee.Geometry.Point(-88.4951, 33.9883), {description: "Enviva Amory", yearly_acres: 2880, open_year: ee.Date('2010-01-01')}),
-    // ee.Feature(ee.Geometry.Point(-82.5730, 31.8543), {description: "Fram Hazlehurst", yearly_acres: 12000, open_year: ee.Date('2021-01-01')}),
-    // ee.Feature(ee.Geometry.Point(-82.4656, 31.8167), {description: "Fram Appling", yearly_acres: 4800, open_year: ee.Date('2009-01-01')}),
+    ee.Feature(ee.Geometry.Point(-82.5730, 31.8543), {description: "Fram Hazlehurst", yearly_acres: 12000, open_year: ee.Date('2021-01-01')}),
+    ee.Feature(ee.Geometry.Point(-82.4656, 31.8167), {description: "Fram Appling", yearly_acres: 4800, open_year: ee.Date('2009-01-01')}),
     // ee.Feature(ee.Geometry.Point(-81.9555, 31.2103), {description: "Fram Archer", yearly_acres: 3264, open_year: ee.Date('2018-01-01')}),
     // ee.Feature(ee.Geometry.Point(-82.6795, 31.9227), {description: "Fram Telfair", yearly_acres: 3264, open_year: ee.Date('2012-01-01')}),
     // ee.Feature(ee.Geometry.Point(-92.0671, 34.2655), {description: "Highland Pine Bluff", yearly_acres: 18000, open_year: ee.Date('2016-01-01')}),
@@ -65,28 +65,24 @@ function addLossLayer(startYear, endYear) {
   Map.addLayer(maskedImage, {bands: ['loss'], max: 1, palette: ['red']}, "Loss " + startYear + "-" + endYear);
 }
 
-  var lossbyyear = countLossByYear(21, addBuffer(bufferedPelletPlants[0], 75));
-  console.log(lossbyyear)
-
-  pelletPlants.forEach(function(plant) {
+function allLossYears(plant) {
     var openYear = plant.get('open_year').getInfo();
     var yearlyAcres = plant.get('yearly_acres').getInfo();
-    // var year = openYear.getInfo().value.slice(0, 4); // Extract year from the ee.Date
     var bufferedPlant = addBuffer(plant, 75);
     console.log(plant.get('description').getInfo());
-    // console.log(openYear);
-    // console.log(yearlyAcres);
-    var datas = []
+
+    var yearsRange = Array.from({length: 21}, function(_, i) { return i + 1; });
     
-    for (var year = 1; year < 22; year ++){
-      datas.push(countLossByYear(year, bufferedPlant).getInfo());
-    // console.log("Year " + year + ": " + countLossByYear(year, bufferedPlant).getInfo());
-    
-    }
-    print(JSON.stringify(datas));
-    // var lossByYearForPlant = countLossByYear(parseInt(year) - 2000, bufferedPlant); // Assuming lossyear is represented as years since 2000
-    // console.log(plant.get('description').getInfo() + " (" + year + "): " + lossByYearForPlant.getInfo());
-  });
+    var datas = yearsRange.map(function(year) {
+        return countLossByYear(year, bufferedPlant).getInfo();
+    });
+
+    console.log(JSON.stringify(datas));
+}
+
+allLossYears(pelletPlants[0]);
+allLossYears(pelletPlants[1]);
+
 
 var treeCoverViz = {
     bands: ['treecover2000'],
@@ -103,5 +99,4 @@ var treeLossYearViz = {
 
 Map.addLayer(gfc, treeCoverViz, 'Hansen 2000 Tree Cover');
 Map.addLayer(gfc, treeLossYearViz, '2000-2020 Year of Loss');
-Map.addLayer(worldCover, {bands: ['Map']}, 'WorldCover');
 Map.addLayer(bufferedPlantCollection, {}, "Wood Pellet Plants with buffer")
