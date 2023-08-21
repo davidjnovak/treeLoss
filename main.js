@@ -74,11 +74,16 @@ function addLossLayer(startYear, endYear) {
     // var year = openYear.getInfo().value.slice(0, 4); // Extract year from the ee.Date
     var bufferedPlant = addBuffer(plant, 75);
     console.log(plant.get('description').getInfo());
-    console.log(openYear);
-    console.log(yearlyAcres);
-    for (var i = 0; i <= 21; i ++){
-      console.log(countLossByYear(i, bufferedPlant).getInfo());
+    // console.log(openYear);
+    // console.log(yearlyAcres);
+    var datas = []
+    
+    for (var year = 1; year < 22; year ++){
+      datas.push(countLossByYear(year, bufferedPlant).getInfo());
+    // console.log("Year " + year + ": " + countLossByYear(year, bufferedPlant).getInfo());
+    
     }
+    print(JSON.stringify(datas));
     // var lossByYearForPlant = countLossByYear(parseInt(year) - 2000, bufferedPlant); // Assuming lossyear is represented as years since 2000
     // console.log(plant.get('description').getInfo() + " (" + year + "): " + lossByYearForPlant.getInfo());
   });
