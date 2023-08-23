@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Read the CSV file
-df = pd.read_csv("path_to_your_csv_file.csv")
+df = pd.read_csv("PelletPlants.csv")
 
 # Convert the string representation of lists to actual lists
 df['50 lossyr'] = df['50 lossyr'].apply(lambda x: eval(x))
