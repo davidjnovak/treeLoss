@@ -50,18 +50,3 @@ ID,status,Facility Name,Company,City,State,"Affected Population (25 mi), statsam
 ",75979,77351,75938,75956,77624,"[li][b]Woodville Pellets[/b] opened in 2014 and produces [b]500,000 tons per year, impacting 12,000 acres annually[/b]. The total acres impacted by this facility is 120,000 and the total tons of pellets produced is 5,000,000 tons.[/li]"
 25,Operating,LJR Forest Products,LJR,Swainsboro,GA,"49,219",Savannah,"238,000","5,712",2016,"45,696","1,904,000",2016-01-01,09-2022,32.5301,"[26523.449115071347,33283.97906365053,20057.799414706886,32880.84889626725,33416.03144340742,31062.880482262302,31548.579149896734,32671.226867167657,22432.414235996188,32724.305065197295,26496.70836550515,37244.72513805228,34602.193503247836,36870.666343394296,34679.72761572507,44772.33904048007,39965.434938618404,37016.12428187954,36678.420535311154,30619.87199031461,29190.241831412328]","[61329.88284697643,68191.67808589204,48854.72357438336,68088.89878533514,72830.78889334739,71451.59455169317,69260.32035363949,71654.29910432061,50874.438652833494,69215.09673176742,63548.92274694371,84741.65617674691,77233.3676198305,85907.11592709135,79952.8426884736,97627.41667638968,92240.73006659446,83480.34347602184,79631.72244127434,66620.25265401996,63966.49845065731]
 ",30401,31049,30441,30471,30457,"[li][b]LJR Forest Products[/b] opened in 2016 and produces [b]238,000 tons per year, impacting 5,712 acres annually[/b]. The total acres impacted by this facility is 45,696 and the total tons of pellets produced is 1,904,000 tons.[/li]"
-26,Proposed,Enviva Epes,Enviva,Epes,AL,"12,164",Pascagoula,"1,200,000","28,800",,,,,12-2021,32.6919,,AL-,,,,,,
-27,Proposed,Enviva Bond,Enviva,Bond,MS,"18,644",Pascagoula,"1,000,000","24,000",,,,,12-2021,30.8942,,MS-,,,,,,
-28,Proposed,Spectrum Adel,No,Adel,GA,"267,849",Savannah,"1,200,000","28,800",,,,,12-2021,31.1328,,GA-,,,,,,
-29,Proposed,Highland Stephens,No,Stephens,AR,"27,047",Baton Rouge,"750,000","18,000",,,,,12-2021,36.2659,,AR-,,,,,,
-30,Proposed,RBG Adel,No,Adel,GA,"267,849",Savannah,"450,000","10,800",,,,,12-2021,31.1382,,GA-,,,,,,
-31,Proposed,AED Copiah,No,Gallman,MS,"62,938",Mississippi River,"500,000","12,000",,,,,12-2021,31.9321,,MS-,,,,,,
-32,Proposed,Jackson Pellets,No,Jackson,AL,"22,760",Mobile,"139,000","3,336",,,,,12-2021,31.5373,,AL-,,,,,,
-33,Proposed,Ideal,No,Ideal,GA,"92,866",Savannah,"131,000","3,144",,,,,12-2021,32.3708,,GA-,,,,,,
-34,Prospective,Enviva Taylorsville,Enviva,Taylorsville,MS,,Pascagoula,,0,,,,,12-2021,31.8282,,MS-,,,,,,
-35,Prospective,Enviva Childersburg,Enviva,Childersburg,AL,,Pascagoula,,0,,,,,12-2021,33.2656,,AL-,,,,,,
-36,Prospective,Enviva Abbeville,Enviva,Abbeville,AL,,Panama City,,0,,,,,12-2021,31.5669,,AL-,,,,,,
-37,Prospective,Enviva Danville,Enviva,Danville,VA,,Chesapeake,,0,,,,,12-2021,36.5788,,VA-,,,,,,
-38,Prospective,Enviva Laurens,Enviva,Clinton,SC,,Wilmington,,0,,,,,12-2021,34.4753,,SC-,,,,,,
-,y - Abandoned,AEG Lumberton ABANDONED,No,Lumberton,NC,,Wilmington,"400,000","9,600",,,,,12-2021,34.6414,,NC-,,,,,,
-,z - CLOSED - Bankruptcy 8/2022,Jasper Pellets CLOSED,No,Ridgeland,SC,"288,813",Savannah,"108,000","2,592",2017,"12,960",,2017-01-01,07-2021,32.4802,,SC-,,,,,,
