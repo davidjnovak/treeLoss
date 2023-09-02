@@ -1,28 +1,28 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 
-# Read the CSV file
 df = pd.read_csv("PelletPlants.csv")
 
-# Convert the string representation of lists to actual lists
-df['50 lossyr'] = df['50 lossyr'].apply(lambda x: eval(x))
-df['75 lossyr'] = df['75 lossyr'].apply(lambda x: eval(x))
+import ast
 
-# Visualization
-def plot_loss_for_plant(index):
-    years = list(range(2000, 2021))
-    
-    plt.figure(figsize=(10, 6))
-    plt.plot(years, df['50 lossyr'].iloc[index], label='50 lossyr', color='blue')
-    plt.plot(years, df['75 lossyr'].iloc[index], label='75 lossyr', color='red')
-    
-    plt.title(f"Loss Yearly Acreage for {df['Facility Name'].iloc[index]}")
-    plt.xlabel('Year')
-    plt.ylabel('Acreage Loss')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
+df['50 lossyr'] = df['50 lossyr'].apply(ast.literal_eval)
+df['75 lossyr'] = df['75 lossyr'].apply(ast.literal_eval)
 
-# Plot for the first pellet plant (can be looped for all plants)
-plot_loss_for_plant(0)
+def avg_loss_before_after(loss_list, open_year, start_year=2000):
+    #data constraints
+        #only take the previous 5 years for before
+        #if the after open is fewer than 3 years, exclude that 
+    before_open = [loss_list[i] for i in range(open_year - start_year) if i < len(loss_list)]
+    after_open = [loss_list[i] for i in range(open_year - start_year, len(loss_list)) if i < len(loss_list)]
+    avg_before = sum(before_open) / len(before_open) if before_open else 0
+    avg_after = sum(after_open) / len(after_open) if after_open else 0
+    print(avg_before, avg_after)
+    
+    return avg_before, avg_after
+
+df['avg_50_loss_before'], df['avg_50_loss_after'] = zip(*df.apply(lambda row: avg_loss_before_after(row['50 lossyr'], row['Open Year']), axis=1))
+df['avg_75_loss_before'], df['avg_75_loss_after'] = zip(*df.apply(lambda row: avg_loss_before_after(row['75 lossyr'], row['Open Year']), axis=1))
+
+# print(df['avg_75_loss_before'], df['avg_75_loss_after'])
+
+# state_summary = df.groupby('State').mean()[['avg_50_loss_before', 'avg_50_loss_after', 'avg_75_loss_before', 'avg_75_loss_after']]
+# print(state_summary)
