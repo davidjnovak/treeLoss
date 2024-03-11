@@ -1,0 +1,248 @@
+var worldCover = ee.ImageCollection('ESA/WorldCover/v100').first();
+var gfc = ee.Image('UMD/hansen/global_forest_change_2022_v1_10');
+var landscapeChange = ee.ImageCollection('USFS/GTAC/LCMS/v2021-7');
+var lossyear = gfc.select("lossyear");
+var plantData = ee.FeatureCollection("projects/ee-davidnovak/assets/data");
+var lossYears50 = plantData.aggregate_array('50 lossyr');
+var lossYears75 = plantData.aggregate_array('75 lossyr');
+var lossYearsList = parseLossYears(lossYears50.get(0));
+  var pelletPlants = [
+      ee.Feature(ee.Geometry.Point(-91.8720, 32.9559), {description: "Morehouse Bioenergy", yearly_acres: 12600, open_year: ee.Date('2015-01-01')}),
+      ee.Feature(ee.Geometry.Point(-91.0377, 31.1849), {description: "Amite Bioenergy", yearly_acres: 12600, open_year: ee.Date('2015-01-01')}),
+      ee.Feature(ee.Geometry.Point(-92.2792, 31.8785), {description: "LaSalle Bioenergy", yearly_acres: 12600, open_year: ee.Date('2017-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.5503, 30.9188), {description: "Enviva Lucedale", yearly_acres: 33600, open_year: ee.Date('2022-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.4114, 31.2565), {description: "Enviva Waycross", yearly_acres: 19200, open_year: ee.Date('2011-01-01')}),
+      ee.Feature(ee.Geometry.Point(-77.6114, 36.5051), {description: "Enviva Northampton", yearly_acres: 18000, open_year: ee.Date('2013-01-01')}),
+      ee.Feature(ee.Geometry.Point(-76.9721, 36.6534), {description: "Enviva Southampton", yearly_acres: 17880, open_year: ee.Date('2015-01-01')}),
+      ee.Feature(ee.Geometry.Point(-85.3911, 30.7401), {description: "Enviva Cottondale", yearly_acres: 17520, open_year: ee.Date('2008-01-01')}),
+      ee.Feature(ee.Geometry.Point(-78.1839, 35.1210), {description: "Enviva Sampson", yearly_acres: 14400, open_year: ee.Date('2016-01-01')}),
+      ee.Feature(ee.Geometry.Point(-79.6379, 34.9337), {description: "Enviva Hamlet", yearly_acres: 14400, open_year: ee.Date('2019-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.0634, 34.2290), {description: "Enviva Greenwood", yearly_acres: 14400, open_year: ee.Date('2018-01-01')}),
+      ee.Feature(ee.Geometry.Point(-76.9656, 36.2690), {description: "Enviva Ahoskie", yearly_acres: 14400, open_year: ee.Date('2011-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.4951, 33.9883), {description: "Enviva Amory", yearly_acres: 2880, open_year: ee.Date('2010-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.5730, 31.8543), {description: "Fram Hazlehurst", yearly_acres: 12000, open_year: ee.Date('2021-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.4656, 31.8167), {description: "Fram Appling", yearly_acres: 4800, open_year: ee.Date('2009-01-01')}),
+      ee.Feature(ee.Geometry.Point(-81.9555, 31.2103), {description: "Fram Archer", yearly_acres: 3264, open_year: ee.Date('2018-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.6795, 31.9227), {description: "Fram Telfair", yearly_acres: 3264, open_year: ee.Date('2012-01-01')}),
+      ee.Feature(ee.Geometry.Point(-92.0671, 34.2655), {description: "Highland Pine Bluff", yearly_acres: 18000, open_year: ee.Date('2016-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.2442, 33.0764), {description: "Pinnacle - Aliceville", yearly_acres: 12384, open_year: ee.Date('2011-01-01')}),
+      ee.Feature(ee.Geometry.Point(-87.9591, 32.4664), {description: "Alabama Pellets Demopolis", yearly_acres: 10632, open_year: ee.Date('2022-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.7340, 32.0457), {description: "MRE Quitman", yearly_acres: 8640, open_year: ee.Date('2021-01-01')}),
+      ee.Feature(ee.Geometry.Point(-85.6264, 35.0713), {description: "MRE Jasper", yearly_acres: 5760, open_year: ee.Date('2017-01-01')}),
+      ee.Feature(ee.Geometry.Point(-86.0369, 34.2760), {description: "MRE Crossville", yearly_acres: 2880, open_year: ee.Date('2018-01-01')}),
+      ee.Feature(ee.Geometry.Point(-94.4322, 30.7424), {description: "Woodville Pellets", yearly_acres: 12000, open_year: ee.Date('2014-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.3404, 32.5301), {description: "LJR Forest Products", yearly_acres: 5712, open_year: ee.Date('2016-01-01')})
+    ];
+    
+  var pelletPlantFeatures = ee.FeatureCollection([
+      ee.Feature(ee.Geometry.Point(-91.8720, 32.9559), {description: "Morehouse Bioenergy", yearly_acres: 12600, open_year: ee.Date('2015-01-01')}),
+      ee.Feature(ee.Geometry.Point(-91.0377, 31.1849), {description: "Amite Bioenergy", yearly_acres: 12600, open_year: ee.Date('2015-01-01')}),
+      ee.Feature(ee.Geometry.Point(-92.2792, 31.8785), {description: "LaSalle Bioenergy", yearly_acres: 12600, open_year: ee.Date('2017-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.5503, 30.9188), {description: "Enviva Lucedale", yearly_acres: 33600, open_year: ee.Date('2022-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.4114, 31.2565), {description: "Enviva Waycross", yearly_acres: 19200, open_year: ee.Date('2011-01-01')}),
+      ee.Feature(ee.Geometry.Point(-77.6114, 36.5051), {description: "Enviva Northampton", yearly_acres: 18000, open_year: ee.Date('2013-01-01')}),
+      ee.Feature(ee.Geometry.Point(-76.9721, 36.6534), {description: "Enviva Southampton", yearly_acres: 17880, open_year: ee.Date('2015-01-01')}),
+      ee.Feature(ee.Geometry.Point(-85.3911, 30.7401), {description: "Enviva Cottondale", yearly_acres: 17520, open_year: ee.Date('2008-01-01')}),
+      ee.Feature(ee.Geometry.Point(-78.1839, 35.1210), {description: "Enviva Sampson", yearly_acres: 14400, open_year: ee.Date('2016-01-01')}),
+      ee.Feature(ee.Geometry.Point(-79.6379, 34.9337), {description: "Enviva Hamlet", yearly_acres: 14400, open_year: ee.Date('2019-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.0634, 34.2290), {description: "Enviva Greenwood", yearly_acres: 14400, open_year: ee.Date('2018-01-01')}),
+      ee.Feature(ee.Geometry.Point(-76.9656, 36.2690), {description: "Enviva Ahoskie", yearly_acres: 14400, open_year: ee.Date('2011-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.4951, 33.9883), {description: "Enviva Amory", yearly_acres: 2880, open_year: ee.Date('2010-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.5730, 31.8543), {description: "Fram Hazlehurst", yearly_acres: 12000, open_year: ee.Date('2021-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.4656, 31.8167), {description: "Fram Appling", yearly_acres: 4800, open_year: ee.Date('2009-01-01')}),
+      ee.Feature(ee.Geometry.Point(-81.9555, 31.2103), {description: "Fram Archer", yearly_acres: 3264, open_year: ee.Date('2018-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.6795, 31.9227), {description: "Fram Telfair", yearly_acres: 3264, open_year: ee.Date('2012-01-01')}),
+      ee.Feature(ee.Geometry.Point(-92.0671, 34.2655), {description: "Highland Pine Bluff", yearly_acres: 18000, open_year: ee.Date('2016-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.2442, 33.0764), {description: "Pinnacle - Aliceville", yearly_acres: 12384, open_year: ee.Date('2011-01-01')}),
+      ee.Feature(ee.Geometry.Point(-87.9591, 32.4664), {description: "Alabama Pellets Demopolis", yearly_acres: 10632, open_year: ee.Date('2022-01-01')}),
+      ee.Feature(ee.Geometry.Point(-88.7340, 32.0457), {description: "MRE Quitman", yearly_acres: 8640, open_year: ee.Date('2021-01-01')}),
+      ee.Feature(ee.Geometry.Point(-85.6264, 35.0713), {description: "MRE Jasper", yearly_acres: 5760, open_year: ee.Date('2017-01-01')}),
+      ee.Feature(ee.Geometry.Point(-86.0369, 34.2760), {description: "MRE Crossville", yearly_acres: 2880, open_year: ee.Date('2018-01-01')}),
+      ee.Feature(ee.Geometry.Point(-94.4322, 30.7424), {description: "Woodville Pellets", yearly_acres: 12000, open_year: ee.Date('2014-01-01')}),
+      ee.Feature(ee.Geometry.Point(-82.3404, 32.5301), {description: "LJR Forest Products", yearly_acres: 5712, open_year: ee.Date('2016-01-01')})
+    ])
+
+  var bufferedPelletPlants = addBuffers(pelletPlants, 50);
+  var bufferedPelletPlants75 = addBuffers(pelletPlants, 75);
+
+  var bufferedPlantCollection = ee.FeatureCollection(bufferedPelletPlants);
+  var bufferedPlantCollection75 = ee.FeatureCollection(bufferedPelletPlants75);
+
+  function createChart(name, chartNum, date, lossYearsList1, lossYearsList2){
+    print(lossYearsList1)
+    var years = [];
+    for (var i = 0; i < 21; i++) {
+        years.push(i);
+    }
+   var lostLists = [];
+    for (var j = 0; j < 21; j++) {
+        lostLists.push([lossYearsList1[j], lossYearsList2[j]]);
+        print(lossYearsList1[j])
+    }
+    
+var chart = ui.Chart.array.values(lostLists, 1, years)
+        .setSeriesNames(['Loss 50 mi', 'Loss 75 mi'])
+        .setOptions({
+            title: name,
+            hAxis: {title: 'Year'},
+            vAxis: {title: 'Loss Value'},
+            lineWidth: 1
+        });
+    // print(chart);
+    panel.widgets().set(chartNum, chart);
+  }
+
+
+
+  function addBuffers(features, miles) {
+    var bufferSize = miles * 1609.34; 
+    return features.map(function(feature) {
+        return ee.Feature(feature.geometry().buffer(bufferSize));
+    });
+  }
+  
+  function addBuffer(feature, miles) {
+    var bufferSize = miles * 1609.34;
+    return feature.geometry().buffer(bufferSize);
+  }
+
+  function parseLossYears(lossYearString) {
+    var dataString = ee.String(lossYearString);
+    var trimmedData = dataString.slice(1, -1);
+    var splitValues = trimmedData.split(',');
+
+    for(var i = 0; i < splitValues.length; i++) {
+        splitValues[i] = parseFloat(splitValues[i].trim());
+    }
+    return splitValues;
+  }
+  
+  function addLossLayer(startYear, endYear) {
+    var mask = lossyear.gte(startYear - 2000).and(lossyear.lte(endYear - 2000));
+    var maskedImage = gfc.updateMask(mask);
+    Map.addLayer(maskedImage, {bands: ['loss'], max: 1, palette: ['red']}, "Loss " + startYear + "-" + endYear);
+  }
+
+  function countLossByYear(year, region) {
+    var lossInYear = lossyear.eq(year);
+    var areaLostInYear = lossInYear.multiply(ee.Image.pixelArea());
+    var totalAreaLost = areaLostInYear.reduceRegion({
+      reducer: ee.Reducer.sum(),
+      geometry: region,
+      scale: 30,  // The scale should match the scale of the gfc dataset.
+      maxPixels: 1e9
+    });
+    return ee.Number(totalAreaLost.get("lossyear")).divide(10000);
+  }
+  
+  function allLossYears(plant) {
+      var openYear = plant.get('open_year').getInfo();
+      var yearlyAcres = plant.get('yearly_acres').getInfo();
+      var bufferedPlant = addBuffer(plant, 50);
+      console.log(plant.get('description').getInfo());
+      
+      var yearsRange = [];
+      for (var iter = 1; iter <= 22; iter++) {
+          yearsRange.push(iter);
+      }
+      // for (var i = 0; i < yearsRange.length; i++) {
+      //     var year = yearsRange[i];
+      //     console.log(year);
+      //     var lossyr = countLossByYear(year, bufferedPlant).getInfo();
+      //     console.log("Year " + year + ": " + lossyr);
+      //     // If you need to collect the results into an array, uncomment the following line
+      //     // datas[i] = lossyr;
+      // }
+  }
+
+// for (var i = 0; i < pelletPlants.length; i++) {
+//   var plant = addBuffer(pelletPlants[i], 75);
+
+// }
+  //     var yearsRange = Array.from({length: 21}, function(_, i) { return i + 1; });
+  //     print(yearsRange);
+  //     var datas = yearsRange.map(function(year) {
+  //         var lossyr =  countLossByYear(year, bufferedPlant).getInfo()
+  //         console.log("Year " + year + ": " +  lossyr);
+  //         // return lossyr;
+  //     });
+  //     console.log(JSON.stringify(datas));
+  // }
+  
+  // pelletPlants.forEach(function(plant){
+  //   allLossYears(plant);
+  // });
+  // allLossYears(ee.Feature(ee.Geometry.Point(-91.8720, 32.9559), {description: "Morehouse Bioenergy", yearly_acres: 12600, open_year: ee.Date('2015-01-01')}))
+  // allLossYears(pelletPlants[4]);
+  
+  // Map.addLayer(gfc, treeCoverViz, 'Hansen 2000 Tree Cover');
+  // Map.addLayer(gfc, treeLossYearViz, '2000-2020 Year of Loss');
+  // Map.addLayer(bufferedPlantCollection, plantViz, "Wood Pellet Plants with buffer")
+  
+var panel = ui.Panel({
+  style: {
+    width: '425px',
+    height: '500px',
+    position: 'bottom-right',
+    
+  }
+});
+// Map.add(panel);
+
+Map.onClick(function(coords) {
+  var clickedPoint = ee.Geometry.Point(coords.lon, coords.lat);
+  var selectedPlant = bufferedPlantCollection.filterBounds(clickedPoint).first();
+  selectedPlant.getInfo(function(featureInfo) {
+    var id = parseInt(featureInfo.id);
+    var open_date = pelletPlants[id].get('open_year').getInfo()
+    var acres = pelletPlants[id].get('yearly_acres').getInfo()
+    var title = pelletPlants[id].get('description').getInfo()
+    createChart(title + " 75 mi", 0, open_date,parseLossYears(lossYears75.get(id)), parseLossYears(lossYears50.get(id)))
+    // createChart(title + " 50 mi", 1, open_date, parseLossYears(lossYears50.get(id)))
+  });
+});
+
+var treeCoverViz = {
+    bands: ['treecover2000'],
+    min: 0,
+    max: 100,
+    palette: ['black', 'green']
+};
+var treeLossYearViz = {
+    bands: ['lossyear'],
+    min: 0,
+    max: 21,
+    palette: ['yellow', 'red']
+};
+var plantViz = {
+  color: 'black'
+};
+
+var pointViz = {
+  color: 'lightblue',
+  pointSize: 5
+};
+
+
+var year = 14;
+var index = 8;
+var miles = 50;
+
+var plant = addBuffer(pelletPlants[index], 50);
+
+var lossyr = countLossByYear(year, plant);
+
+var title = pelletPlants[index].get('description').getInfo();
+
+print("loss (hectares) at " + title + " in 20" + year + ":");
+print(lossyr);
+addLossLayer(2000 + year, 2001 + year);
+
+Map.addLayer(gfc, treeCoverViz, 'Hansen 2000 Tree Cover');
+Map.addLayer(gfc, treeLossYearViz, '2000-2021 Year of Loss');
+
+
+Map.addLayer(bufferedPlantCollection, plantViz, "Wood Pellet Plants with buffer (50 miles)")
+// Map.addLayer(bufferedPlantCollection75, plantViz, "Wood Pellet Plants with buffer (75 miles)")
+
+// Map.addLayer(pelletPlantFeatures, pointViz, 'Pellet Plants');
